@@ -3,16 +3,20 @@ import {
   ComplexBlockPosition, ComplexKindBlock, ContainerElement, createBlockContentElement,
   createComplexBlockPosition, createElement, DocBlock, EditorComplexSelectionRange,
   getContainerId, getLogger, isContainer, MoveDirection, NextContainerOptions,
-  NextEditor, SelectionRange, selectionToDoc, SimpleBlockPosition,
+  NextEditor, NextEditorCustom, NextEditorInputHandler, removeClass, SelectionRange, selectionToDoc, SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
 import { convertToList } from './convert-to-list';
 import { getChildContainer, getListChildContainers, getTextContainer } from './list-dom';
 
 import './list-block.scss';
+import ListBlockInputHandler from './input-handler';
 
 const console = getLogger('list-block');
 
 function createBlockContent(editor: NextEditor, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
+  //
+  ListBlockInputHandler.init(editor);
+  //
   const children = blockData.children;
   assert(children, 'list no children');
   assert(children.length === 1 || children.length === 2, 'invalid list children');
@@ -88,7 +92,9 @@ function updateSelection(editor: NextEditor, block: BlockElement, from: BlockPos
 }
 
 function clearSelection(editor: NextEditor): void {
-
+  editor.rootContainer.querySelectorAll('[data-type="editor-block"][data-block-type="list"]').forEach((block) => {
+    removeClass(block, 'full-selected');
+  });
 }
 
 function getChildContainers(complexBlock: BlockElement): ContainerElement[] {

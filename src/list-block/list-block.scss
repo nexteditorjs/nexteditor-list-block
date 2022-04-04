@@ -1,6 +1,15 @@
 .editor-root {
   [data-type=editor-container].root {
+
+    div[data-type=editor-block].list-block+div[data-type=editor-block].list-block {
+      margin-top: 0.6em;
+    }
+
     div[data-type=editor-block].list-block {
+      &.full-selected {
+        background-color: var(--background-selection);
+      }
+
       div[data-type=block-content] {
         div.editor-list-root {
           display: flex;

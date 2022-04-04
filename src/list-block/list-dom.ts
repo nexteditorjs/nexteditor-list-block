@@ -1,7 +1,7 @@
 import {
   assert, BlockContentElement, BlockElement, ContainerElement,
   createBlockContentElement, createElement, DocBlock,
-  getBlockContent, getBlockType, NextEditor,
+  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 
 export function isListBlock(block: BlockElement) {
@@ -49,4 +49,35 @@ export function getListChildContainers(listBlock: BlockElement): ContainerElemen
     ret.push(child);
   }
   return ret;
+}
+
+export function isListTextBlock(block: BlockElement) {
+  if (getBlockType(block) !== 'text') {
+    return false;
+  }
+  const container = getParentContainer(block);
+  if (!isChildContainer(container)) {
+    return false;
+  }
+  //
+  const parentBlock = getParentBlock(container);
+  assert(parentBlock, 'no parent block');
+  if (!isListBlock(parentBlock)) {
+    return false;
+  }
+  //
+  return container === getTextContainer(parentBlock);
+}
+
+export function getParentListBlock(node: Node): BlockElement | null {
+  const parentElement = node.parentElement;
+  if (!parentElement) {
+    return null;
+  }
+  //
+  const list = parentElement.closest('div[data-type=editor-block].list-block');
+  if (!list) {
+    return null;
+  }
+  return list as BlockElement;
 }
