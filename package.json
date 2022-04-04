@@ -1,0 +1,31 @@
+{
+  "name": "@nexteditorjs/nexteditor-list-block",
+  "version": "0.0.31",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "dist": "vite build && tsc --emitDeclarationOnly --project tsconfig.dist.json"
+  },
+  "dependencies": {
+    "@nexteditorjs/nexteditor-core": "^0.0.31",
+    "lodash.clonedeep": "^4.5.0",
+    "blueimp-md5": "^2.19.0"
+  },
+  "devDependencies": {
+    "@types/blueimp-md5": "^2.18.0",
+    "@types/lodash.clonedeep": "^4.5.0",
+    "@types/node": "^12.0.0",
+    "typescript": "^4.5.4",
+    "prettier": "^2.5.1",
+    "sass": "*",
+    "vite": "^2.8.0",
+    "@nexteditorjs/nexteditor-input-handlers": "^0.0.31",
+    "vite-plugin-css-injected-by-js": "^1.1.0"
+  }
+}

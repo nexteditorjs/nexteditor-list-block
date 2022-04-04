@@ -1,0 +1,11 @@
+.editor-root {
+  [data-type=editor-container].root {
+    div[data-type=editor-block].list-block {
+      div[data-type=block-content] {
+        div.editor-list-root {
+          display: flex;
+        }
+      }
+    }
+  }
+}
