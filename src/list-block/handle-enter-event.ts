@@ -80,5 +80,6 @@ export function handleEditorEnterEvent(editor: NextEditor) {
     return false;
   }
   //
-  return editor.undoManager.runInGroup(() => listTextBlockHandleEnterEvent(editor));
+  editor.undoManager.runInGroup(() => listTextBlockHandleEnterEvent(editor));
+  return true;
 }

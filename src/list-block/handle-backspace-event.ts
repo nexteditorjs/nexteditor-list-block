@@ -78,5 +78,6 @@ export function handleEditorBackspaceEvent(editor: NextEditor) {
     return false;
   }
   //
-  return editor.undoManager.runInGroup(() => listTextBlockHandleBackspaceEvent(editor));
+  editor.undoManager.runInGroup(() => listTextBlockHandleBackspaceEvent(editor));
+  return true;
 }

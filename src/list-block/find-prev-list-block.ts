@@ -1,4 +1,7 @@
-import { assert, BlockElement, complexBlockGetAllChildContainers, getParentBlock, getParentContainer, getPrevBlock, isRootContainer, NextEditor } from '@nexteditorjs/nexteditor-core';
+import {
+  assert, BlockElement, getParentBlock, getParentContainer, getPrevBlock,
+  isComplexKindBlock, isFirstChildBlock, NextEditor,
+} from '@nexteditorjs/nexteditor-core';
 import { isListBlock } from './list-dom';
 
 export function findPrevListBlockCanBeInsert(editor: NextEditor, block: BlockElement): {
@@ -13,20 +16,13 @@ export function findPrevListBlockCanBeInsert(editor: NextEditor, block: BlockEle
     return null;
   }
   //
-  const parentContainer = getParentContainer(block);
-  if (isRootContainer(parentContainer)) {
+  if (!isFirstChildBlock(editor, block)) {
     return null;
   }
   //
-  const parentComplexBlock = getParentBlock(parentContainer);
-  assert(parentComplexBlock, 'no parent complex block');
-  //
-  const childContainers = complexBlockGetAllChildContainers(editor, parentComplexBlock);
-  const index = childContainers.indexOf(parentContainer);
-  assert(index !== -1, 'not a valid child container');
-  if (index !== 0) {
-    return null;
-  }
+  const parentComplexBlock = getParentBlock(getParentContainer(block));
+  assert(parentComplexBlock, 'no parent block');
+  assert(isComplexKindBlock(editor, parentComplexBlock), 'not a complex block');
   //
   return findPrevListBlockCanBeInsert(editor, parentComplexBlock);
 }

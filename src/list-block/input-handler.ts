@@ -15,13 +15,11 @@ export default class ListBlockInputHandler implements NextEditorInputHandler, Ne
 
   handleBeforeKeyDown(editor: NextEditor, event: KeyboardEvent): boolean {
     if (event.key === 'Enter') {
-      handleEditorEnterEvent(editor);
-      return true;
+      return handleEditorEnterEvent(editor);
     }
     //
     if (event.key === 'Backspace') {
-      handleEditorBackspaceEvent(editor);
-      return true;
+      return handleEditorBackspaceEvent(editor);
     }
     //
     if (event.key === 'Tab') {
