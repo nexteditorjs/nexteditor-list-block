@@ -3,7 +3,7 @@ import {
   createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
   DocObject,
   genId,
-  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
+  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, isContainer, isRootContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 
 export function isListBlock(block: BlockElement) {
@@ -109,4 +109,34 @@ export function getParentListBlock(node: Node): BlockElement | null {
     return null;
   }
   return list as BlockElement;
+}
+
+export function isInListChild(block: BlockElement): boolean {
+  const parentContainer = getParentContainer(block);
+  if (isRootContainer(parentContainer)) {
+    return false;
+  }
+  //
+  const parentBlock = getParentBlock(parentContainer);
+  assert(parentBlock, 'no parent block');
+  //
+  if (isListBlock(parentBlock)) {
+    return true;
+  }
+  //
+  if (isListTextBlock(block)) {
+    const parentList = getParentListBlock(block);
+    assert(parentList, 'no parent list');
+    return isInListChild(parentList);
+  }
+  //
+  return false;
+}
+
+export function getParentListBlockChildContainer(block: BlockElement): ContainerElement {
+  assert(isInListChild(block), 'no in list block');
+  const container = block.closest('div.list-child-root > div[data-type=editor-container]');
+  assert(container, 'no parent list child container');
+  assert(isContainer(container), 'not a container');
+  return container as ContainerElement;
 }

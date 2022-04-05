@@ -1,5 +1,6 @@
-import { assert, BlockElement, blocksToDoc, getChildBlockCount, getPrevBlock, isMatchShortcut, NextEditor } from '@nexteditorjs/nexteditor-core';
-import { createListChildContainer, getListChildContainer, getParentListBlock, isListBlock, isListTextBlock } from './list-dom';
+import { assert, BlockElement, blocksToDoc, getChildBlockCount, getPrevBlock, NextEditor } from '@nexteditorjs/nexteditor-core';
+import { findPrevListBlockCanBeInsert } from './find-prev-list-block';
+import { createListChildContainer, getListChildContainer, isListBlock } from './list-dom';
 
 function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[]) {
   if (blocks.length === 0) return false;
@@ -22,45 +23,34 @@ function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[]) {
   return true;
 }
 
-function listTextBlockHandleTabEvent(editor: NextEditor, listBlocks: BlockElement[]) {
-  const selectedBlocks = editor.selection.range.getSelectedBlocks();
-  if (selectedBlocks.length === 0) {
-    return false;
-  }
-  //
-  if (selectedBlocks.length === 1) {
-    if (isListTextBlock(selectedBlocks[0].block)) {
-      const listBlock = getParentListBlock(selectedBlocks[0].block);
-      assert(listBlock, 'no parent list block');
-      moveBlocksToPrevListChild(editor, [listBlock]);
-      return true;
-    }
-  }
-  //
-  const blocks = selectedBlocks.map((s) => s.block);
-  moveBlocksToPrevListChild(editor, blocks);
-  return true;
-}
-
 export function handleEditorTabEvent(editor: NextEditor) {
   const selectedBlocks = editor.selection.range.getSelectedBlocks();
   if (selectedBlocks.length === 0) {
     return false;
   }
   //
-  if (selectedBlocks.length === 1) {
-    if (isListTextBlock(selectedBlocks[0].block)) {
-      //
-    }
-  }
-  //
-  if (selectedBlocks.some((s) => !isListTextBlock(s.block))) {
+  const findResult = findPrevListBlockCanBeInsert(editor, selectedBlocks[0].block);
+  if (!findResult) {
     return false;
   }
   //
-  const blocks = selectedBlocks.map((s) => s.block);
+  let blocks: BlockElement[];
   //
-  editor.undoManager.runInGroup(() => listTextBlockHandleTabEvent(editor, blocks));
+  const { listBlock, adjustedBlock } = findResult;
+  assert(isListBlock(listBlock), 'not a list block');
+  //
+  if (adjustedBlock === selectedBlocks[0].block) {
+    //
+    blocks = selectedBlocks.map((s) => s.block);
+    //
+  } else {
+    assert(selectedBlocks.length === 1, 'invalid selected blocks');
+    //
+    blocks = [adjustedBlock];
+    //
+  }
+  //
+  editor.undoManager.runInGroup(() => moveBlocksToPrevListChild(editor, blocks));
   //
   return true;
 }
