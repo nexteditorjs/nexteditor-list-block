@@ -1,4 +1,5 @@
 import { NextEditor, NextEditorCustom, NextEditorInputHandler } from '@nexteditorjs/nexteditor-core';
+import { handleEditorBackspaceEvent } from './handle-backspace-event';
 import { handleEditorEnterEvent } from './handle-enter-event';
 
 export default class ListBlockInputHandler implements NextEditorInputHandler, NextEditorCustom {
@@ -13,6 +14,10 @@ export default class ListBlockInputHandler implements NextEditorInputHandler, Ne
   handleBeforeKeyDown(editor: NextEditor, event: KeyboardEvent): boolean {
     if (event.key === 'Enter') {
       return handleEditorEnterEvent(editor);
+    }
+    //
+    if (event.key === 'Backspace') {
+      return handleEditorBackspaceEvent(editor);
     }
     return false;
   }
