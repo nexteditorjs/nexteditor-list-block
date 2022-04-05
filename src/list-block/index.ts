@@ -3,10 +3,10 @@ import {
   ComplexBlockPosition, ComplexKindBlock, ContainerElement, createBlockContentElement,
   createComplexBlockPosition, createElement, DocBlock, EditorComplexSelectionRange,
   getContainerId, getLogger, isContainer, MoveDirection, NextContainerOptions,
-  NextEditor, NextEditorCustom, NextEditorInputHandler, removeClass, SelectionRange, selectionToDoc, SimpleBlockPosition,
+  NextEditor, removeClass, SelectionRange, SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
 import { convertToList } from './convert-to-list';
-import { getChildContainer, getListChildContainers, getTextContainer } from './list-dom';
+import { createListBlockContent, getListChildContainer, getListChildContainers, getTextContainer } from './list-dom';
 
 import './list-block.scss';
 import ListBlockInputHandler from './input-handler';
@@ -14,23 +14,8 @@ import ListBlockInputHandler from './input-handler';
 const console = getLogger('list-block');
 
 function createBlockContent(editor: NextEditor, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
-  //
   ListBlockInputHandler.init(editor);
-  //
-  const children = blockData.children;
-  assert(children, 'list no children');
-  assert(children.length === 1 || children.length === 2, 'invalid list children');
-  const root = createBlockContentElement(blockElement, 'div');
-  const list = createElement('div', ['editor-list-root'], root);
-  const marker = createElement('div', ['list-marker'], list);
-  marker.innerText = '[]';
-  const textRoot = createElement('div', ['list-text-root'], list);
-  editor.createChildContainer(textRoot, children[0]);
-  if (children.length === 2) {
-    const childRoot = createElement('div', ['editor-list-child'], root);
-    editor.createChildContainer(childRoot, children[1]);
-  }
-  return root as BlockContentElement;
+  return createListBlockContent(editor, container, blockIndex, blockElement, blockData);
 }
 
 function getBlockTextLength(block: BlockElement): number {
@@ -104,9 +89,9 @@ function getChildContainers(complexBlock: BlockElement): ContainerElement[] {
 function getNextContainer(complexBlock: BlockElement, childContainer: ContainerElement, type: MoveDirection, options?: NextContainerOptions): ContainerElement | null {
   if (type === 'ArrowDown' || type === 'ArrowRight') {
     if (childContainer === getTextContainer(complexBlock)) {
-      return getChildContainer(complexBlock);
+      return getListChildContainer(complexBlock);
     }
-  } else if (childContainer === getChildContainer(complexBlock)) {
+  } else if (childContainer === getListChildContainer(complexBlock)) {
     return getTextContainer(complexBlock);
   }
   return null;
@@ -145,7 +130,7 @@ const ListBlock: ComplexKindBlock = {
   convertFrom: convertToList,
   // handleDeleteBlock,
   // getClientRects,
-  selectionToDoc,
+  // selectionToDoc,
 };
 
 export { ListBlock };

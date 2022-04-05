@@ -5,7 +5,7 @@ import {
   NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
 import { insertListBlock } from './insert-list-block';
-import { getChildContainer, getParentListBlock, isListTextBlock } from './list-dom';
+import { getListChildContainer, getParentListBlock, isListTextBlock } from './list-dom';
 
 function listTextBlockHandleEnterEvent(editor: NextEditor) {
   if (!editor.selection.range.isCollapsed()) {
@@ -37,7 +37,7 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   const listBlock = getParentListBlock(textBlock);
   assert(listBlock, 'invalid list block dom. no parent list block');
   //
-  if (getTextLength(blockData.text) === 0 && !getChildContainer(listBlock)) {
+  if (getTextLength(blockData.text) === 0 && !getListChildContainer(listBlock)) {
     // remove list
     const parentContainer = getParentContainer(listBlock);
     editor.insertBlock(getContainerId(parentContainer), getBlockIndex(listBlock), {
@@ -54,7 +54,7 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   //
   editor.setBlockText(textBlock, left);
   //
-  const listChildContainer = getChildContainer(listBlock);
+  const listChildContainer = getListChildContainer(listBlock);
   if (listChildContainer) {
     editor.insertBlock(getContainerId(listChildContainer), 0, {
       id: genId(),

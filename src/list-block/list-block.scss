@@ -12,7 +12,12 @@
 
       div[data-type=block-content] {
         div.editor-list-root {
-          display: flex;
+          div.list-text-root {
+            display: flex;
+          }
+          div.list-child-root {
+            padding-left: 16px;
+          }
         }
       }
     }

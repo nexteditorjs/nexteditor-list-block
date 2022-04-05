@@ -1,6 +1,8 @@
-import { NextEditor, NextEditorCustom, NextEditorInputHandler } from '@nexteditorjs/nexteditor-core';
+import { isMatchShortcut, NextEditor, NextEditorCustom, NextEditorInputHandler } from '@nexteditorjs/nexteditor-core';
 import { handleEditorBackspaceEvent } from './handle-backspace-event';
 import { handleEditorEnterEvent } from './handle-enter-event';
+import { handleEditorShiftTabEvent } from './handle-shift-tab-event';
+import { handleEditorTabEvent } from './handle-tab-event';
 
 export default class ListBlockInputHandler implements NextEditorInputHandler, NextEditorCustom {
   constructor(private editor: NextEditor) {
@@ -13,11 +15,23 @@ export default class ListBlockInputHandler implements NextEditorInputHandler, Ne
 
   handleBeforeKeyDown(editor: NextEditor, event: KeyboardEvent): boolean {
     if (event.key === 'Enter') {
-      return handleEditorEnterEvent(editor);
+      handleEditorEnterEvent(editor);
+      return true;
     }
     //
     if (event.key === 'Backspace') {
-      return handleEditorBackspaceEvent(editor);
+      handleEditorBackspaceEvent(editor);
+      return true;
+    }
+    //
+    if (event.key === 'Tab') {
+      if (isMatchShortcut(event, 'Shift+Tab')) {
+        handleEditorShiftTabEvent(editor);
+        return true;
+      }
+      //
+      handleEditorTabEvent(editor);
+      return true;
     }
     return false;
   }

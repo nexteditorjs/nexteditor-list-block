@@ -1,6 +1,8 @@
 import {
-  assert, BlockContentElement, BlockElement, ContainerElement,
-  createBlockContentElement, createElement, DocBlock,
+  assert, BlockContentElement, BlockElement, cloneDoc, ContainerElement,
+  createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
+  DocObject,
+  genId,
   getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 
@@ -14,9 +16,9 @@ export function createListBlockContent(editor: NextEditor, container: ContainerE
   assert(children.length === 1 || children.length === 2, 'invalid list children');
   const blockContent = createBlockContentElement(blockElement, 'div');
   const listRoot = createElement('div', ['editor-list-root'], blockContent);
-  const marker = createElement('div', ['list-marker'], listRoot);
-  marker.innerText = '[]';
   const textRoot = createElement('div', ['list-text-root'], listRoot);
+  const marker = createElement('div', ['list-marker'], textRoot);
+  marker.innerText = '[]';
   editor.createChildContainer(textRoot, children[0]);
   if (children.length === 2) {
     const childRoot = createElement('div', ['list-child-root'], listRoot);
@@ -33,7 +35,7 @@ export function getTextContainer(listBlock: BlockElement): ContainerElement {
   return textContainer as ContainerElement;
 }
 
-export function getChildContainer(listBlock: BlockElement): ContainerElement | null {
+export function getListChildContainer(listBlock: BlockElement): ContainerElement | null {
   assert(isListBlock(listBlock), 'not a list block');
   const content = getBlockContent(listBlock);
   const textContainer = content.querySelector(':scope > div.editor-list-root > div.list-child-root [data-type=editor-container].child') as ContainerElement;
@@ -41,10 +43,37 @@ export function getChildContainer(listBlock: BlockElement): ContainerElement | n
   return textContainer as ContainerElement;
 }
 
+export function createListChildContainer(editor: NextEditor, listBlock: BlockElement, initDoc: DocObject) {
+  assert(isListBlock(listBlock), 'not a list block');
+  assert(!getListChildContainer(listBlock), 'child container has already exists');
+  //
+  const doc = cloneDoc(editor, initDoc);
+  //
+  const newContainerId = genId();
+  Object.entries(doc.blocks).forEach(([containerId, blocks]) => {
+    if (containerId === 'root') {
+      editor.doc.localInsertChildContainer(newContainerId, blocks);
+      return;
+    }
+    editor.doc.localInsertChildContainer(containerId, blocks);
+  });
+  //
+  const oldData = editor.getBlockData(listBlock);
+  assert(oldData.children, 'no list child');
+  assert(oldData.children.length === 1, 'invalid list children data');
+  const newData = {
+    ...oldData,
+    children: [oldData.children[0], newContainerId],
+  };
+  //
+  const newRange = createBlockSimpleRange(editor, doc.blocks.root[0].id, 0);
+  editor.updateBlockData(listBlock, newData, newRange);
+}
+
 export function getListChildContainers(listBlock: BlockElement): ContainerElement[] {
   assert(isListBlock(listBlock), 'not a list block');
   const ret = [getTextContainer(listBlock)];
-  const child = getChildContainer(listBlock);
+  const child = getListChildContainer(listBlock);
   if (child) {
     ret.push(child);
   }
