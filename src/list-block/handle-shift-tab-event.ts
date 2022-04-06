@@ -3,15 +3,16 @@ import {
   getChildBlocks, getParentContainer, isRootContainer,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
-import { getListChildContainer, getParentListBlock, isListTextBlock } from './list-dom';
+import { findParentListChildContainer } from './find-parent-list-child-container';
+import { getListChildContainer, getParentListBlock, isListBlock } from './list-dom';
 
-function moveBlocksOutListChild(editor: NextEditor, blocks: BlockElement[]) {
-  if (blocks.length === 0) return false;
+function moveBlocksOutListChild(editor: NextEditor, blocks: BlockElement[]): BlockElement[] {
+  if (blocks.length === 0) return [];
   const blockParentContainer = getParentContainer(blocks[0]);
-  if (isRootContainer(blockParentContainer)) return false;
+  if (isRootContainer(blockParentContainer)) return [];
   //
   const parentListBlock = getParentListBlock(blockParentContainer);
-  if (!parentListBlock) return false;
+  if (!parentListBlock) return [];
   //
   assert(blockParentContainer === getListChildContainer(parentListBlock));
   //
@@ -22,7 +23,7 @@ function moveBlocksOutListChild(editor: NextEditor, blocks: BlockElement[]) {
   const targetContainer = getParentContainer(parentListBlock);
   const targetIndex = getBlockIndex(parentListBlock) + 1;
   //
-  editor.insertDocAt(targetContainer, targetIndex, doc);
+  const insertedBlocks = editor.insertDocAt(targetContainer, targetIndex, doc);
   //
   if (fromIndex === 0) {
     //
@@ -39,7 +40,7 @@ function moveBlocksOutListChild(editor: NextEditor, blocks: BlockElement[]) {
     subBlocks.forEach((block) => editor.deleteBlock(block));
   }
   //
-  return true;
+  return insertedBlocks;
 }
 
 export function handleEditorShiftTabEvent(editor: NextEditor) {
@@ -48,20 +49,28 @@ export function handleEditorShiftTabEvent(editor: NextEditor) {
     return false;
   }
   //
-  const first = selectedBlocks[0].block;
-  const parentContainer = getParentContainer(first);
-  if (isRootContainer(parentContainer)) {
+  const findRet = findParentListChildContainer(editor, selectedBlocks[0].block);
+  if (!findRet) {
     return false;
   }
   //
-  if (isListTextBlock(first)) {
-    const parentList = getParentListBlock(first);
-    assert(parentList, 'no parent list');
-    moveBlocksOutListChild(editor, [parentList]);
-    return true;
+  let blocks: BlockElement[] = [];
+  //
+  const { listBlock, adjustedBlock } = findRet;
+  assert(isListBlock(listBlock), 'not a list block');
+  //
+  if (adjustedBlock === selectedBlocks[0].block) {
+    blocks = selectedBlocks.map((s) => s.block);
+  } else {
+    blocks = [adjustedBlock];
   }
   //
-  const blocks = selectedBlocks.map((s) => s.block);
-  moveBlocksOutListChild(editor, blocks);
+  //
+  editor.undoManager.runInGroup(() => {
+    //
+    moveBlocksOutListChild(editor, blocks);
+    //
+  });
+  //
   return true;
 }
