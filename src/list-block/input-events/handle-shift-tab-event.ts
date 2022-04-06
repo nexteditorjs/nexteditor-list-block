@@ -1,12 +1,11 @@
 import {
-  assert, BlockElement, blocksToDoc, CloneBlockResultInfo, createBlockSimpleRange, createSimpleBlockPosition, EditorSimpleSelectionRange, getBlockIndex,
-  getBlockTextLength,
+  assert, BlockElement, blocksToDoc, CloneBlockResultInfo, getBlockIndex,
   getChildBlocks, getParentBlock, getParentContainer, isRootContainer,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
-import { findParentListChildContainer } from './find-parent-list-child-container';
+import { findParentListChildContainer } from '../find-parent-list-child-container';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
-import { getListChildContainer, isListBlock } from './list-dom';
+import { getListChildContainer, isListBlock } from '../list-dom';
 
 function moveBlocksOutListChild(editor: NextEditor, fromBlock: BlockElement, cloneDocResult: CloneBlockResultInfo): BlockElement[] {
   const parentContainer = getParentContainer(fromBlock);

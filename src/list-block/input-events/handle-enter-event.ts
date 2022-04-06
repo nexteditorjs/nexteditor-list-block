@@ -4,8 +4,8 @@ import {
   getTextLength,
   NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
-import { insertListBlock } from './insert-list-block';
-import { getListChildContainer, getParentListBlock, isListTextBlock } from './list-dom';
+import { insertListBlock } from '../insert-list-block';
+import { getListChildContainer, getParentListBlock, isListTextBlock } from '../list-dom';
 
 function listTextBlockHandleEnterEvent(editor: NextEditor) {
   if (!editor.selection.range.isCollapsed()) {

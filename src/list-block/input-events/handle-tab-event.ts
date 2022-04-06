@@ -3,9 +3,9 @@ import {
   getChildBlockCount, getPrevBlock,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
-import { findPrevListBlockCanBeInsert } from './find-prev-list-block';
+import { findPrevListBlockCanBeInsert } from '../find-prev-list-block';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
-import { createListChildContainer, getListChildContainer, isListBlock } from './list-dom';
+import { createListChildContainer, getListChildContainer, isListBlock } from '../list-dom';
 
 function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[], cloneDocResult: CloneBlockResultInfo) {
   if (blocks.length === 0) return false;

@@ -10,7 +10,7 @@ export function isListBlock(block: BlockElement) {
   return getBlockType(block) === 'list';
 }
 
-export function createListBlockContent(editor: NextEditor, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
+export function createListBlockContent(editor: NextEditor, blockElement: BlockElement, blockData: DocBlock, markerContent: string | Element): BlockContentElement {
   const children = blockData.children;
   assert(children, 'list no children');
   assert(children.length === 1 || children.length === 2, 'invalid list children');
@@ -18,13 +18,23 @@ export function createListBlockContent(editor: NextEditor, container: ContainerE
   const listRoot = createElement('div', ['editor-list-root'], blockContent);
   const textRoot = createElement('div', ['list-text-root'], listRoot);
   const marker = createElement('div', ['list-marker'], textRoot);
-  marker.innerText = '[]';
+  if (typeof markerContent === 'string') {
+    marker.innerText = markerContent;
+  } else {
+    marker.appendChild(markerContent);
+  }
   editor.createChildContainer(textRoot, children[0]);
   if (children.length === 2) {
     const childRoot = createElement('div', ['list-child-root'], listRoot);
     editor.createChildContainer(childRoot, children[1]);
   }
   return blockContent as BlockContentElement;
+}
+
+export function updateListStart(block: BlockElement, start: number) {
+  const marker = block.querySelector('div.list-marker') as HTMLDivElement;
+  assert(marker, 'no list marker');
+  marker.innerText = `${start}.`;
 }
 
 export function getTextContainer(listBlock: BlockElement): ContainerElement {

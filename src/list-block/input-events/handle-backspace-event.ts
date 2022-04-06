@@ -1,12 +1,14 @@
-import { createBlockSimpleRange,
-  assert,
+import { assert,
   BlockElement,
   containerToDoc,
   getBlockIndex, getContainerId, getParentContainer,
   mergeDocs,
   NextEditor,
+  CloneBlockResultInfo,
 } from '@nexteditorjs/nexteditor-core';
-import { getListChildContainers, getParentListBlock, isListBlock, isListTextBlock } from './list-dom';
+import { getListChildContainers, getParentListBlock, isListBlock, isListTextBlock } from '../list-dom';
+import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
+import { tryMergeTextToListBlock } from './merge-list-block';
 
 function listBlockToTextBlock(editor: NextEditor, listBlock: BlockElement) {
   assert(isListBlock(listBlock), 'not a list block');
@@ -22,9 +24,16 @@ function listBlockToTextBlock(editor: NextEditor, listBlock: BlockElement) {
   const blockIndex = getBlockIndex(listBlock);
   //
   //
-  const insertedBlocks = editor.insertDocAt(parentContainer, blockIndex, doc);
-  const newRange = createBlockSimpleRange(editor, insertedBlocks[0], 0);
-  return { newRange };
+  const oldRange = editor.selection.range.clone();
+  const cloneDocResult: CloneBlockResultInfo = {
+    containerIdMap: new Map<string, string>(),
+    blockIdMap: new Map<string, string>(),
+  };
+  editor.insertDocAt(parentContainer, blockIndex, doc, cloneDocResult);
+  keepSelectionAfterMoveBlocks(editor, oldRange, cloneDocResult);
+  return {
+    newRange: editor.selection.range.toDocRange(),
+  };
 }
 
 function listTextBlockHandleBackspaceEvent(editor: NextEditor) {
@@ -75,9 +84,8 @@ export function handleEditorBackspaceEvent(editor: NextEditor) {
   }
   //
   if (!isListTextBlock(s.block)) {
-    return false;
+    return tryMergeTextToListBlock(editor);
   }
   //
-  editor.undoManager.runInGroup(() => listTextBlockHandleBackspaceEvent(editor));
-  return true;
+  return editor.undoManager.runInGroup(() => listTextBlockHandleBackspaceEvent(editor));
 }

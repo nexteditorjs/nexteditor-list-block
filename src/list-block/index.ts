@@ -1,7 +1,6 @@
 import {
   addClass, assert, BlockContentElement, BlockElement, BlockPosition,
-  ComplexBlockPosition, ComplexKindBlock, ContainerElement, createBlockContentElement,
-  createComplexBlockPosition, createElement, DocBlock, EditorComplexSelectionRange,
+  ComplexBlockPosition, ComplexKindBlock, ContainerElement, createComplexBlockPosition, DocBlock, EditorComplexSelectionRange,
   getContainerId, getLogger, isContainer, MoveDirection, NextContainerOptions,
   NextEditor, removeClass, SelectionRange, SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
@@ -9,13 +8,16 @@ import { convertToList } from './convert-to-list';
 import { createListBlockContent, getListChildContainer, getListChildContainers, getTextContainer } from './list-dom';
 
 import './list-block.scss';
-import ListBlockInputHandler from './input-handler';
+import ListBlockInputHandler from './input-events/input-handler';
+import { getListMarker } from './list-marker';
+import ListBlockDocCallbacks from './doc-events/doc-events';
 
 const console = getLogger('list-block');
 
 function createBlockContent(editor: NextEditor, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
   ListBlockInputHandler.init(editor);
-  return createListBlockContent(editor, container, blockIndex, blockElement, blockData);
+  ListBlockDocCallbacks.init(editor);
+  return createListBlockContent(editor, blockElement, blockData, getListMarker(editor, container, blockIndex));
 }
 
 function getBlockTextLength(block: BlockElement): number {

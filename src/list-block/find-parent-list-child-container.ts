@@ -1,5 +1,5 @@
 import {
-  assert, BlockElement, getParentBlock, getParentContainer, isFirstChildBlock,
+  assert, BlockElement, getParentBlock, getParentContainer, isFirstChildBlockInComplexBlock,
   isRootContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { getListChildContainer, isListBlock } from './list-dom';
@@ -23,7 +23,7 @@ export function findParentListChildContainer(editor: NextEditor, block: BlockEle
     };
   }
   //
-  if (!isFirstChildBlock(editor, block)) {
+  if (!isFirstChildBlockInComplexBlock(editor, block)) {
     return null;
   }
   //
