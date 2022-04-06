@@ -1,8 +1,13 @@
-import { assert, BlockElement, blocksToDoc, getChildBlockCount, getPrevBlock, NextEditor } from '@nexteditorjs/nexteditor-core';
+import {
+  assert, BlockElement, blocksToDoc, CloneBlockResultInfo,
+  getChildBlockCount, getPrevBlock,
+  NextEditor,
+} from '@nexteditorjs/nexteditor-core';
 import { findPrevListBlockCanBeInsert } from './find-prev-list-block';
+import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
 import { createListChildContainer, getListChildContainer, isListBlock } from './list-dom';
 
-function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[]) {
+function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[], cloneDocResult: CloneBlockResultInfo) {
   if (blocks.length === 0) return false;
   const prevBlock = getPrevBlock(blocks[0]);
   if (!prevBlock) return false;
@@ -13,9 +18,9 @@ function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[]) {
   //
   const childContainer = getListChildContainer(parentListBlock);
   if (!childContainer) {
-    createListChildContainer(editor, parentListBlock, doc);
+    createListChildContainer(editor, parentListBlock, doc, cloneDocResult);
   } else {
-    editor.insertDocAt(childContainer, getChildBlockCount(childContainer), doc);
+    editor.insertDocAt(childContainer, getChildBlockCount(childContainer), doc, cloneDocResult);
   }
   //
   blocks.forEach((block) => editor.deleteBlock(block));
@@ -34,6 +39,8 @@ export function handleEditorTabEvent(editor: NextEditor) {
     return false;
   }
   //
+  const oldRange = editor.selection.range.clone();
+  //
   let blocks: BlockElement[];
   //
   const { listBlock, adjustedBlock } = findResult;
@@ -50,7 +57,17 @@ export function handleEditorTabEvent(editor: NextEditor) {
     //
   }
   //
-  editor.undoManager.runInGroup(() => moveBlocksToPrevListChild(editor, blocks));
+  editor.undoManager.runInGroup(() => {
+    //
+    const cloneDocResult: CloneBlockResultInfo = {
+      containerIdMap: new Map<string, string>(),
+      blockIdMap: new Map<string, string>(),
+    };
+    //
+    moveBlocksToPrevListChild(editor, blocks, cloneDocResult);
+    //
+    keepSelectionAfterMoveBlocks(editor, oldRange, cloneDocResult);
+  });
   //
   return true;
 }

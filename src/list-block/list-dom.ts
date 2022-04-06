@@ -1,9 +1,9 @@
 import {
-  assert, BlockContentElement, BlockElement, cloneDoc, ContainerElement,
+  assert, BlockContentElement, BlockElement, CloneBlockResultInfo, cloneDoc, ContainerElement,
   createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
   DocObject,
   genId,
-  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, isContainer, isRootContainer, NextEditor,
+  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 
 export function isListBlock(block: BlockElement) {
@@ -43,11 +43,11 @@ export function getListChildContainer(listBlock: BlockElement): ContainerElement
   return textContainer as ContainerElement;
 }
 
-export function createListChildContainer(editor: NextEditor, listBlock: BlockElement, initDoc: DocObject) {
+export function createListChildContainer(editor: NextEditor, listBlock: BlockElement, initDoc: DocObject, cloneDocResult?: CloneBlockResultInfo) {
   assert(isListBlock(listBlock), 'not a list block');
   assert(!getListChildContainer(listBlock), 'child container has already exists');
   //
-  const doc = cloneDoc(editor, initDoc);
+  const doc = cloneDoc(editor, initDoc, cloneDocResult);
   //
   const newContainerId = genId();
   Object.entries(doc.blocks).forEach(([containerId, blocks]) => {

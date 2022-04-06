@@ -5,7 +5,7 @@ import { handleEditorShiftTabEvent } from './handle-shift-tab-event';
 import { handleEditorTabEvent } from './handle-tab-event';
 
 export default class ListBlockInputHandler implements NextEditorInputHandler, NextEditorCustom {
-  constructor(private editor: NextEditor) {
+  constructor(editor: NextEditor) {
     editor.input.addHandler(this);
   }
 

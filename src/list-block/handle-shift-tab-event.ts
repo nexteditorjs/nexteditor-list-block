@@ -1,29 +1,30 @@
 import {
-  assert, BlockElement, blocksToDoc, getBlockIndex,
-  getChildBlocks, getParentContainer, isRootContainer,
+  assert, BlockElement, blocksToDoc, CloneBlockResultInfo, createBlockSimpleRange, createSimpleBlockPosition, EditorSimpleSelectionRange, getBlockIndex,
+  getBlockTextLength,
+  getChildBlocks, getParentBlock, getParentContainer, isRootContainer,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { findParentListChildContainer } from './find-parent-list-child-container';
-import { getListChildContainer, getParentListBlock, isListBlock } from './list-dom';
+import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
+import { getListChildContainer, isListBlock } from './list-dom';
 
-function moveBlocksOutListChild(editor: NextEditor, blocks: BlockElement[]): BlockElement[] {
-  if (blocks.length === 0) return [];
-  const blockParentContainer = getParentContainer(blocks[0]);
-  if (isRootContainer(blockParentContainer)) return [];
+function moveBlocksOutListChild(editor: NextEditor, fromBlock: BlockElement, cloneDocResult: CloneBlockResultInfo): BlockElement[] {
+  const parentContainer = getParentContainer(fromBlock);
+  assert(!isRootContainer(parentContainer), 'not a child block');
+  const parentListBlock = getParentBlock(parentContainer);
+  assert(parentListBlock, 'no parent block');
+  assert(isListBlock(parentListBlock), 'not a list block');
+  assert(getListChildContainer(parentListBlock) === parentContainer, 'not a list child block');
+  const listChildContainer = parentContainer;
   //
-  const parentListBlock = getParentListBlock(blockParentContainer);
-  if (!parentListBlock) return [];
-  //
-  assert(blockParentContainer === getListChildContainer(parentListBlock));
-  //
-  const fromIndex = getBlockIndex(blocks[0]);
-  const subBlocks = getChildBlocks(blockParentContainer).slice(fromIndex);
+  const fromIndex = getBlockIndex(fromBlock);
+  const subBlocks = getChildBlocks(listChildContainer).slice(fromIndex);
   const doc = blocksToDoc(editor, subBlocks);
   //
   const targetContainer = getParentContainer(parentListBlock);
   const targetIndex = getBlockIndex(parentListBlock) + 1;
   //
-  const insertedBlocks = editor.insertDocAt(targetContainer, targetIndex, doc);
+  const insertedBlocks = editor.insertDocAt(targetContainer, targetIndex, doc, cloneDocResult);
   //
   if (fromIndex === 0) {
     //
@@ -54,22 +55,30 @@ export function handleEditorShiftTabEvent(editor: NextEditor) {
     return false;
   }
   //
-  let blocks: BlockElement[] = [];
+  const oldRange = editor.selection.range.clone();
+  //
+  let fromBlock: BlockElement;
   //
   const { listBlock, adjustedBlock } = findRet;
   assert(isListBlock(listBlock), 'not a list block');
   //
   if (adjustedBlock === selectedBlocks[0].block) {
-    blocks = selectedBlocks.map((s) => s.block);
+    fromBlock = selectedBlocks[0].block;
   } else {
-    blocks = [adjustedBlock];
+    fromBlock = adjustedBlock;
   }
   //
   //
   editor.undoManager.runInGroup(() => {
     //
-    moveBlocksOutListChild(editor, blocks);
+    const cloneDocResult: CloneBlockResultInfo = {
+      containerIdMap: new Map<string, string>(),
+      blockIdMap: new Map<string, string>(),
+    };
+
+    moveBlocksOutListChild(editor, fromBlock, cloneDocResult);
     //
+    keepSelectionAfterMoveBlocks(editor, oldRange, cloneDocResult);
   });
   //
   return true;
