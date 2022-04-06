@@ -2,7 +2,7 @@
   [data-type=editor-container].root {
 
     div[data-type=editor-block].list-block+div[data-type=editor-block].list-block {
-      margin-top: 0.6em;
+      margin-top: 0.4em;
     }
 
     div[data-type=editor-block].list-block {
@@ -14,9 +14,25 @@
         div.editor-list-root {
           div.list-text-root {
             display: flex;
+
+            .list-marker {
+              width: 24px;
+              text-align: right;
+            }
           }
           div.list-child-root {
-            padding-left: 16px;
+            padding-left: 24px;
+
+            > [data-type=editor-container].child {
+              > :first-child {
+                margin-top: 0.4em;
+              }
+              > *+* {
+                margin-top: 0.4em;
+              }  
+            }
+
+
           }
         }
       }
