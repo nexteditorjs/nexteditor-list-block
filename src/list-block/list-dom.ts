@@ -1,10 +1,12 @@
 import {
+  addClass,
   assert, BlockContentElement, BlockElement, BlockPath, CloneBlockResultInfo, cloneDoc, ContainerElement,
   createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
   DocObject,
   genId,
   getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
+import { ListData } from './list-data';
 import { startToMarker } from './marker/start-to-marker';
 
 export function isListBlock(block: BlockElement) {
@@ -12,10 +14,16 @@ export function isListBlock(block: BlockElement) {
 }
 
 export function createListBlockContent(editor: NextEditor, path: BlockPath, blockElement: BlockElement, blockData: DocBlock, markerContent: string | Element): BlockContentElement {
+  const listData = blockData as ListData;
   const children = blockData.children;
   assert(children, 'list no children');
   assert(children.length === 1 || children.length === 2, 'invalid list children');
   const blockContent = createBlockContentElement(blockElement, 'div');
+  addClass(blockContent, listData.listType);
+  if (listData.listType === 'checkbox' && listData.checked) {
+    addClass(blockContent, 'checked');
+  }
+  //
   const listRoot = createElement('div', ['editor-list-root'], blockContent);
   const textRoot = createElement('div', ['list-text-root'], listRoot);
   const marker = createElement('div', ['list-marker'], textRoot);
@@ -29,6 +37,7 @@ export function createListBlockContent(editor: NextEditor, path: BlockPath, bloc
     const childRoot = createElement('div', ['list-child-root'], listRoot);
     editor.createChildContainer(path, childRoot, children[1]);
   }
+  //
   return blockContent as BlockContentElement;
 }
 

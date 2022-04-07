@@ -6,6 +6,7 @@ export interface ListData {
   start?: number;
   listType: ListType;
   children: string[];
+  checked?: boolean;
   [index: string]: unknown;
 }
 

@@ -2,6 +2,7 @@ import { assert, BlockPath, ContainerElement, getContainerBlockPath, getContaine
 import { isSameListType, ListData } from './list-data';
 import { updateListStart } from './list-dom';
 import { getListLevel } from './list-level';
+import { createCheckedIcon, createUncheckedIcon } from './marker/checkbox';
 import { startToMarker } from './marker/start-to-marker';
 
 const logger = getLogger('list-marker');
@@ -46,7 +47,10 @@ export function getListMarker(editor: NextEditor, path: BlockPath, container: Co
     return '*';
   }
   if (currData.listType === 'checkbox') {
-    return '[]';
+    if (currData.checked) {
+      return createCheckedIcon();
+    }
+    return createUncheckedIcon();
   }
   //
   const start = getListStart(editor, container, blockIndex);

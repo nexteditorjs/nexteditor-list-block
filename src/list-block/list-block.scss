@@ -15,6 +15,28 @@
       }
 
       div[data-type=block-content] {
+
+        &.checkbox {
+          .list-marker {
+            cursor: pointer;
+            span {
+              font-family: 'Material Icons Outlined';
+              font-size: 1em;
+              line-height: 1.4em;
+              margin-top: 1px;
+            }
+          }
+        }
+        &.checkbox.checked {
+          div.editor-list-root {
+            div.list-text-root {
+              .list-marker {
+                color: #aaa;
+              }
+            }
+          }
+        }
+
         div.editor-list-root {
           div.list-text-root {
             display: flex;

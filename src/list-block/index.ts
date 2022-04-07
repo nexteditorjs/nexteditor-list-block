@@ -13,12 +13,14 @@ import './list-block.scss';
 import ListBlockInputHandler from './input-events/input-handler';
 import { getListMarker } from './list-marker';
 import ListBlockDocCallbacks from './doc-events/doc-events';
+import ListBlockMarkerCallbacks from './marker/marker-event';
 
 const console = getLogger('list-block');
 
 function createBlockContent(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
   ListBlockInputHandler.init(editor);
   ListBlockDocCallbacks.init(editor);
+  ListBlockMarkerCallbacks.init(editor);
   return createListBlockContent(editor, path, blockElement, blockData, getListMarker(editor, path, container, blockIndex));
 }
 
