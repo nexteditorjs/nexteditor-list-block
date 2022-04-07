@@ -1,4 +1,4 @@
-import { assert, ContainerElement, getContainerId, getNextBlock, NextEditor } from '@nexteditorjs/nexteditor-core';
+import { assert, ContainerElement, getContainerId, NextEditor } from '@nexteditorjs/nexteditor-core';
 import { isSameListType, ListData } from './list-data';
 import { updateListStart } from './list-dom';
 
@@ -46,7 +46,7 @@ export function getListMarker(editor: NextEditor, container: ContainerElement, b
   return `${start}.`;
 }
 
-export function updateListMarkerFrom(editor: NextEditor, containerId: string, blockIndex: number) {
+export function updateCurrentListMarkerFrom(editor: NextEditor, containerId: string, blockIndex: number) {
   //
   const blocks = editor.doc.getContainerBlocks(containerId);
   if (blockIndex >= blocks.length) {
@@ -78,5 +78,32 @@ export function updateListMarkerFrom(editor: NextEditor, containerId: string, bl
     const listStart = index === blockIndex ? start : start + (index - blockIndex);
     const block = editor.getBlockByIndex(containerId, index);
     updateListStart(block, listStart);
+  }
+}
+
+export function updateAllListMarkerFrom(editor: NextEditor, containerId: string, fromBlockIndex: number) {
+  //
+  const blocks = editor.doc.getContainerBlocks(containerId);
+  if (fromBlockIndex >= blocks.length) {
+    return;
+  }
+  //
+  const container = editor.getContainerById(containerId);
+  //
+  let start: number | undefined = getListStart(editor, container, fromBlockIndex);
+  for (let blockIndex = fromBlockIndex; blockIndex < blocks.length; blockIndex++) {
+    //
+    const blockData = blocks[blockIndex] as ListData;
+    if (blockData.type !== 'list' || blockData.listType !== 'ordered') {
+      start = undefined;
+      continue;
+    }
+    //
+    if (start === undefined) {
+      start = blockData.start ?? 1;
+    }
+    const block = editor.getBlockByIndex(containerId, blockIndex);
+    updateListStart(block, start);
+    start += 1;
   }
 }

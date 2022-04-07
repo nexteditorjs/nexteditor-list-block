@@ -68,9 +68,6 @@ export function tryMergeTextToListBlock(editor: NextEditor): boolean {
     assert(isTextKindBlock(editor, listText), 'not a text block');
     editorMergeTextBlock(editor, listText, block);
     return true;
-    //
-    //
-    return false;
   }
   //
   if (!isListBlock(prevBlock)) {
