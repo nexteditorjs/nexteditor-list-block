@@ -1,3 +1,3 @@
-import { TextBlock } from '@nexteditorjs/nexteditor-core';
+import ListBlock from './list-block';
 
-export { TextBlock };
+export default ListBlock;

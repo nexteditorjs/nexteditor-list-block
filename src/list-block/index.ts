@@ -1,6 +1,7 @@
 import {
   addClass, assert, BlockContentElement, BlockElement, BlockPosition,
   ComplexBlockPosition, ComplexKindBlock, ContainerElement, createComplexBlockPosition, DocBlock, EditorComplexSelectionRange,
+  getChildBlockCount,
   getContainerId, getLogger, isContainer, MoveDirection, NextContainerOptions,
   NextEditor, removeClass, SelectionRange, SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
@@ -43,6 +44,10 @@ function getRangeFromPoint(editor: NextEditor, block: BlockElement, x: number, y
     return null;
   }
   //
+  if (getChildBlockCount(container) > 1) {
+    return null;
+  }
+  //
   const startPos = createComplexBlockPosition(block, getContainerId(container));
   return new EditorComplexSelectionRange(editor, startPos);
 }
@@ -71,16 +76,23 @@ function updateSelection(editor: NextEditor, block: BlockElement, from: BlockPos
   const t = to as ComplexBlockPosition;
   assert(f.blockId === t.blockId, 'only allow update one table selection');
   //
-  // const childContainers = getEditorSelectedContainers(editor, f, t);
-  // childContainers.forEach((c) => {
-  //   const cell = getContainerCell(c);
-  //   addClass(cell, 'selected');
-  // });
+  const containers = getListChildContainers(block);
+  containers.forEach((container) => {
+    const containerId = getContainerId(container);
+    if (containerId === f.childContainerId || containerId === t.childContainerId) {
+      addClass(container, 'selected');
+    }
+  });
 }
 
 function clearSelection(editor: NextEditor): void {
   editor.rootContainer.querySelectorAll('[data-type="editor-block"][data-block-type="list"]').forEach((block) => {
     removeClass(block, 'full-selected');
+    //
+    block.querySelectorAll('div[data-type=editor-container].child.selected').forEach((c) => {
+      removeClass(c, 'selected');
+    });
+    //
   });
 }
 
@@ -135,4 +147,4 @@ const ListBlock: ComplexKindBlock = {
   // selectionToDoc,
 };
 
-export { ListBlock };
+export default ListBlock;

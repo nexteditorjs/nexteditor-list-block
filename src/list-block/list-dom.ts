@@ -90,10 +90,7 @@ export function getListChildContainers(listBlock: BlockElement): ContainerElemen
   return ret;
 }
 
-export function isListTextBlock(block: BlockElement) {
-  if (getBlockType(block) !== 'text') {
-    return false;
-  }
+export function isListTextChildBlock(block: BlockElement) {
   const container = getParentContainer(block);
   if (!isChildContainer(container)) {
     return false;

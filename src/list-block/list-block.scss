@@ -10,6 +10,10 @@
         background-color: var(--background-selection);
       }
 
+      div[data-type=editor-container].child.selected {
+        background-color: var(--background-selection);
+      }
+
       div[data-type=block-content] {
         div.editor-list-root {
           div.list-text-root {
@@ -20,7 +24,8 @@
               text-align: right;
               display: flex;
               justify-content: flex-end;
-              align-items: center;
+              align-items: flex-start;
+              line-height: 1.4em;
               padding-right: 4px;
               white-space: nowrap;
             }

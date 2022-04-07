@@ -5,7 +5,7 @@ import {
   isEmptyTextBlock, isRootContainer, isTextKindBlock, NextEditor,
   SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
-import { isListBlock, isListTextBlock, getListChildContainer, getParentListBlock, getTextContainer } from '../list-dom';
+import { isListBlock, isListTextChildBlock, getListChildContainer, getParentListBlock, getTextContainer } from '../list-dom';
 
 function isListFirstChildBlock(editor: NextEditor, block: BlockElement) {
   if (getPrevBlock(block)) {
@@ -51,7 +51,7 @@ export function tryMergeTextToListBlock(editor: NextEditor): boolean {
     return false;
   }
   //
-  if (isListTextBlock(block)) {
+  if (isListTextChildBlock(block)) {
     return false;
   }
   //

@@ -5,8 +5,9 @@ import { assert,
   mergeDocs,
   NextEditor,
   CloneBlockResultInfo,
+  isTextKindBlock,
 } from '@nexteditorjs/nexteditor-core';
-import { getListChildContainers, getParentListBlock, isListBlock, isListTextBlock } from '../list-dom';
+import { getListChildContainers, getParentListBlock, isListBlock, isListTextChildBlock } from '../list-dom';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
 import { tryMergeTextToListBlock } from './merge-list-block';
 
@@ -47,7 +48,7 @@ function listTextBlockHandleBackspaceEvent(editor: NextEditor) {
   }
   //
   const selectedBlock = selectedBlocks[0];
-  if (!isListTextBlock(selectedBlock.block)) {
+  if (!isListTextChildBlock(selectedBlock.block)) {
     return false;
   }
   const { start, end } = selectedBlock;
@@ -56,7 +57,7 @@ function listTextBlockHandleBackspaceEvent(editor: NextEditor) {
   assert(start.blockId === end.blockId, 'invalid selected block');
   //
   const textBlock = selectedBlock.block;
-  if (!isListTextBlock(textBlock)) {
+  if (!isListTextChildBlock(textBlock)) {
     return false;
   }
   //
@@ -83,9 +84,14 @@ export function handleEditorBackspaceEvent(editor: NextEditor) {
     return false;
   }
   //
-  if (!isListTextBlock(s.block)) {
+  if (!isTextKindBlock(editor, s.block)) {
+    return false;
+  }
+  //
+  if (!isListTextChildBlock(s.block)) {
     return tryMergeTextToListBlock(editor);
   }
   //
+  // list block to text block
   return editor.undoManager.runInGroup(() => listTextBlockHandleBackspaceEvent(editor));
 }

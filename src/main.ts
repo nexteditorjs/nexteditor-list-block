@@ -7,7 +7,7 @@ import {
 } from '@nexteditorjs/nexteditor-core';
 import { MarkdownInputHandler } from '@nexteditorjs/nexteditor-input-handlers';
 
-import { ListBlock } from './list-block';
+import ListBlock from './list-block';
 import './style.css';
 
 const app = document.querySelector<HTMLDivElement>('#app');

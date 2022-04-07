@@ -1,11 +1,30 @@
 import {
   assert,
+  BlockElement,
+  DocBlockText,
   genId, getBlockIndex, getContainerId, getParentContainer,
   getTextLength,
+  isTextKindBlock,
   NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
 import { insertListBlock } from '../insert-list-block';
-import { getListChildContainer, getParentListBlock, isListTextBlock } from '../list-dom';
+import { getListChildContainer, getParentListBlock, isListBlock, isListTextChildBlock } from '../list-dom';
+
+function insertTextBlockToListChild(editor: NextEditor, listBlock: BlockElement, text: DocBlockText) {
+  assert(isListBlock(listBlock), 'not a list block');
+  const listChildContainer = getListChildContainer(listBlock);
+  if (listChildContainer) {
+    editor.insertBlock(getContainerId(listChildContainer), 0, {
+      id: genId(),
+      type: 'text',
+      text,
+    });
+  } else {
+    const parentContainer = getParentContainer(listBlock);
+    const targetIndex = getBlockIndex(listBlock) + 1;
+    insertListBlock(editor, parentContainer, targetIndex, text);
+  }
+}
 
 function listTextBlockHandleEnterEvent(editor: NextEditor) {
   if (!editor.selection.range.isCollapsed()) {
@@ -18,7 +37,7 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   }
   //
   const selectedBlock = selectedBlocks[0];
-  if (!isListTextBlock(selectedBlock.block)) {
+  if (!isListTextChildBlock(selectedBlock.block)) {
     return false;
   }
   const { start, end } = selectedBlock;
@@ -26,16 +45,19 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   assert(start.offset === end.offset, 'invalid block offset');
   assert(start.blockId === end.blockId, 'invalid selected block');
   //
-  const textBlock = selectedBlock.block;
-  if (!isListTextBlock(textBlock)) {
-    return false;
+  const listTextChildBlock = selectedBlock.block;
+  const listBlock = getParentListBlock(listTextChildBlock);
+  assert(listBlock, 'invalid list block dom. no parent list block');
+  //
+  if (!isTextKindBlock(editor, listTextChildBlock)) {
+    insertTextBlockToListChild(editor, listBlock, []);
+    return true;
   }
+  //
+  const textBlock = listTextChildBlock;
   //
   const blockData = editor.getBlockData(textBlock);
   assert(blockData.text);
-  //
-  const listBlock = getParentListBlock(textBlock);
-  assert(listBlock, 'invalid list block dom. no parent list block');
   //
   if (getTextLength(blockData.text) === 0 && !getListChildContainer(listBlock)) {
     // remove list
@@ -54,18 +76,7 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   //
   editor.setBlockText(textBlock, left);
   //
-  const listChildContainer = getListChildContainer(listBlock);
-  if (listChildContainer) {
-    editor.insertBlock(getContainerId(listChildContainer), 0, {
-      id: genId(),
-      type: 'text',
-      text: right,
-    });
-  } else {
-    const parentContainer = getParentContainer(listBlock);
-    const targetIndex = getBlockIndex(listBlock) + 1;
-    insertListBlock(editor, parentContainer, targetIndex, right);
-  }
+  insertTextBlockToListChild(editor, listBlock, right);
   //
   return true;
 }
@@ -76,7 +87,7 @@ export function handleEditorEnterEvent(editor: NextEditor) {
     return false;
   }
   //
-  if (!isListTextBlock(s.block)) {
+  if (!isListTextChildBlock(s.block)) {
     return false;
   }
   //
