@@ -1,10 +1,10 @@
 import {
-  assert, BlockElement, ConvertBlockResult, genId,
+  assert, BlockElement, ConvertBlockResult, DocBlockAttributes, genId,
   isTextKindBlock, NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
 import { ListData } from './list-data';
 
-export function convertToList(editor: NextEditor, srcBlock: BlockElement, options: { offset: number }): ConvertBlockResult | null {
+export function convertToList(editor: NextEditor, srcBlock: BlockElement, options: { offset: number, data?: DocBlockAttributes }): ConvertBlockResult | null {
   //
   if (!isTextKindBlock(editor, srcBlock)) {
     return null;
@@ -22,10 +22,15 @@ export function convertToList(editor: NextEditor, srcBlock: BlockElement, option
   const textContainerId = genId();
   editor.doc.localInsertChildContainer(textContainerId, [textBlock]);
   //
+  let listType: 'ordered' | 'unordered' | 'checkbox' = 'ordered';
+  if (options.data?.listType === 'unordered' || options.data?.listType === 'checkbox') {
+    listType = options.data.listType;
+  }
+  //
   const listData: ListData = {
     id: genId(),
     type: 'list',
-    listType: 'ordered',
+    listType,
     children: [textContainerId],
   };
   return {

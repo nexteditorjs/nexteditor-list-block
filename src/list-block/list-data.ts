@@ -1,8 +1,10 @@
+export type ListType = 'ordered' | 'unordered' | 'checkbox';
+
 export interface ListData {
   type: 'list';
   id: string;
   start?: number;
-  listType: 'ordered' | 'unordered' | 'checkbox';
+  listType: ListType;
   children: string[];
   [index: string]: unknown;
 }

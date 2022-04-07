@@ -8,7 +8,13 @@ import {
   NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
 import { insertListBlock } from '../insert-list-block';
+import { ListData } from '../list-data';
 import { getListChildContainer, getParentListBlock, isListBlock, isListTextChildBlock } from '../list-dom';
+
+function getListType(editor: NextEditor, listBlock: BlockElement) {
+  assert(isListBlock(listBlock), 'not a list block');
+  return (editor.getBlockData(listBlock) as ListData).listType;
+}
 
 function insertTextBlockToListChild(editor: NextEditor, listBlock: BlockElement, text: DocBlockText) {
   assert(isListBlock(listBlock), 'not a list block');
@@ -22,7 +28,7 @@ function insertTextBlockToListChild(editor: NextEditor, listBlock: BlockElement,
   } else {
     const parentContainer = getParentContainer(listBlock);
     const targetIndex = getBlockIndex(listBlock) + 1;
-    insertListBlock(editor, parentContainer, targetIndex, text);
+    insertListBlock(editor, parentContainer, targetIndex, text, getListType(editor, listBlock));
   }
 }
 
