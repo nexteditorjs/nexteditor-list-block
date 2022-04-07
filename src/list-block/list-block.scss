@@ -25,9 +25,11 @@
               display: flex;
               justify-content: flex-end;
               align-items: flex-start;
+              flex-shrink: 0;
               line-height: 1.4em;
               padding-right: 4px;
               white-space: nowrap;
+              color: var(--primary-color);
             }
           }
           div.list-child-root {

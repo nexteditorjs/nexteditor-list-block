@@ -1,6 +1,10 @@
-import { assert, ContainerElement, getContainerId, NextEditor } from '@nexteditorjs/nexteditor-core';
+import { assert, BlockPath, ContainerElement, getContainerBlockPath, getContainerId, getLogger, NextEditor } from '@nexteditorjs/nexteditor-core';
 import { isSameListType, ListData } from './list-data';
 import { updateListStart } from './list-dom';
+import { getListLevel } from './list-level';
+import { startToMarker } from './marker/start-to-marker';
+
+const logger = getLogger('list-marker');
 
 export function getListStart(editor: NextEditor, container: ContainerElement, blockIndex: number) {
   const containerId = getContainerId(container);
@@ -32,7 +36,10 @@ export function getListStart(editor: NextEditor, container: ContainerElement, bl
   return count;
 }
 
-export function getListMarker(editor: NextEditor, container: ContainerElement, blockIndex: number): string | Element {
+export function getListMarker(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number): string | Element {
+  const level = getListLevel(editor, path);
+  logger.log(`${level}`);
+  //
   const containerId = getContainerId(container);
   const currData = editor.doc.getBlockData(containerId, blockIndex) as ListData;
   if (currData.listType === 'unordered') {
@@ -43,7 +50,7 @@ export function getListMarker(editor: NextEditor, container: ContainerElement, b
   }
   //
   const start = getListStart(editor, container, blockIndex);
-  return `${start}.`;
+  return startToMarker(level, start);
 }
 
 export function updateCurrentListMarkerFrom(editor: NextEditor, containerId: string, blockIndex: number) {
@@ -67,6 +74,9 @@ export function updateCurrentListMarkerFrom(editor: NextEditor, containerId: str
   assert(listData.listType === 'ordered', 'not an ordered list');
   const container = editor.getContainerById(containerId);
   //
+  const path = getContainerBlockPath(container);
+  const level = getListLevel(editor, path) + 1;
+  //
   const start = getListStart(editor, container, blockIndex);
   for (let index = blockIndex; index < blocks.length; index++) {
     //
@@ -77,7 +87,7 @@ export function updateCurrentListMarkerFrom(editor: NextEditor, containerId: str
     //
     const listStart = index === blockIndex ? start : start + (index - blockIndex);
     const block = editor.getBlockByIndex(containerId, index);
-    updateListStart(block, listStart);
+    updateListStart(block, level, listStart);
   }
 }
 
@@ -89,6 +99,9 @@ export function updateAllListMarkerFrom(editor: NextEditor, containerId: string,
   }
   //
   const container = editor.getContainerById(containerId);
+  const path = getContainerBlockPath(container);
+  const level = getListLevel(editor, path) + 1;
+
   //
   let start: number | undefined = getListStart(editor, container, fromBlockIndex);
   for (let blockIndex = fromBlockIndex; blockIndex < blocks.length; blockIndex++) {
@@ -103,7 +116,7 @@ export function updateAllListMarkerFrom(editor: NextEditor, containerId: string,
       start = blockData.start ?? 1;
     }
     const block = editor.getBlockByIndex(containerId, blockIndex);
-    updateListStart(block, start);
+    updateListStart(block, level, start);
     start += 1;
   }
 }

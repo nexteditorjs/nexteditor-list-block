@@ -1,6 +1,7 @@
 import {
   addClass, assert, BlockContentElement, BlockElement, BlockPosition,
-  ComplexBlockPosition, ComplexKindBlock, ContainerElement, createComplexBlockPosition, DocBlock, EditorComplexSelectionRange,
+  ComplexBlockPosition, ComplexKindBlock, ContainerElement, BlockPath,
+  createComplexBlockPosition, DocBlock, EditorComplexSelectionRange,
   getChildBlockCount,
   getContainerId, getLogger, isContainer, MoveDirection, NextContainerOptions,
   NextEditor, removeClass, SelectionRange, SimpleBlockPosition,
@@ -15,10 +16,10 @@ import ListBlockDocCallbacks from './doc-events/doc-events';
 
 const console = getLogger('list-block');
 
-function createBlockContent(editor: NextEditor, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
+function createBlockContent(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
   ListBlockInputHandler.init(editor);
   ListBlockDocCallbacks.init(editor);
-  return createListBlockContent(editor, blockElement, blockData, getListMarker(editor, container, blockIndex));
+  return createListBlockContent(editor, path, blockElement, blockData, getListMarker(editor, path, container, blockIndex));
 }
 
 function getBlockTextLength(block: BlockElement): number {
@@ -139,12 +140,8 @@ const ListBlock: ComplexKindBlock = {
   clearSelection,
   getChildContainers,
   getNextContainer,
-  // getMinWidth,
   getSelectedContainers,
   convertFrom: convertToList,
-  // handleDeleteBlock,
-  // getClientRects,
-  // selectionToDoc,
 };
 
 export default ListBlock;

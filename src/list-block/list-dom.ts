@@ -1,16 +1,17 @@
 import {
-  assert, BlockContentElement, BlockElement, CloneBlockResultInfo, cloneDoc, ContainerElement,
+  assert, BlockContentElement, BlockElement, BlockPath, CloneBlockResultInfo, cloneDoc, ContainerElement,
   createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
   DocObject,
   genId,
   getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
+import { startToMarker } from './marker/start-to-marker';
 
 export function isListBlock(block: BlockElement) {
   return getBlockType(block) === 'list';
 }
 
-export function createListBlockContent(editor: NextEditor, blockElement: BlockElement, blockData: DocBlock, markerContent: string | Element): BlockContentElement {
+export function createListBlockContent(editor: NextEditor, path: BlockPath, blockElement: BlockElement, blockData: DocBlock, markerContent: string | Element): BlockContentElement {
   const children = blockData.children;
   assert(children, 'list no children');
   assert(children.length === 1 || children.length === 2, 'invalid list children');
@@ -23,18 +24,18 @@ export function createListBlockContent(editor: NextEditor, blockElement: BlockEl
   } else {
     marker.appendChild(markerContent);
   }
-  editor.createChildContainer(textRoot, children[0]);
+  editor.createChildContainer(path, textRoot, children[0]);
   if (children.length === 2) {
     const childRoot = createElement('div', ['list-child-root'], listRoot);
-    editor.createChildContainer(childRoot, children[1]);
+    editor.createChildContainer(path, childRoot, children[1]);
   }
   return blockContent as BlockContentElement;
 }
 
-export function updateListStart(block: BlockElement, start: number) {
+export function updateListStart(block: BlockElement, level: number, start: number) {
   const marker = block.querySelector('div.list-marker') as HTMLDivElement;
   assert(marker, 'no list marker');
-  marker.innerText = `${start}.`;
+  marker.innerText = startToMarker(level, start);
 }
 
 export function getTextContainer(listBlock: BlockElement): ContainerElement {
