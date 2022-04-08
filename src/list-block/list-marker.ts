@@ -2,6 +2,7 @@ import { assert, BlockPath, ContainerElement, getContainerBlockPath, getContaine
 import { isSameListType, ListData } from './list-data';
 import { updateListStart } from './list-dom';
 import { getListLevel } from './list-level';
+import { getBullet } from './marker/bullet';
 import { createCheckedIcon, createUncheckedIcon } from './marker/checkbox';
 import { startToMarker } from './marker/start-to-marker';
 
@@ -39,12 +40,11 @@ export function getListStart(editor: NextEditor, container: ContainerElement, bl
 
 export function getListMarker(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number): string | Element {
   const level = getListLevel(editor, path);
-  logger.log(`${level}`);
   //
   const containerId = getContainerId(container);
   const currData = editor.doc.getBlockData(containerId, blockIndex) as ListData;
   if (currData.listType === 'unordered') {
-    return '*';
+    return getBullet(level);
   }
   if (currData.listType === 'checkbox') {
     if (currData.checked) {

@@ -37,6 +37,31 @@
           }
         }
 
+        &.unordered {
+          div.editor-list-root {
+            div.list-text-root {
+              .list-marker {
+                span.bullet0,
+                span.bullet1 {
+                  font-size: 1.4em;
+                  font-family: Arial;
+                  line-height: 1em;
+                }
+                span.bullet1 {
+                  font-size: 1.6em;
+                }
+                span.bullet2 {
+                  font-size: 1.2em;
+                  margin-right: -4px;
+                  margin-top: 2px;
+                  overflow: hidden;
+                  line-height: 1em;
+                }
+              }
+            }
+          }
+        }
+
         div.editor-list-root {
           div.list-text-root {
             display: flex;
