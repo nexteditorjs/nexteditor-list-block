@@ -37,6 +37,6 @@ export default class ListBlockInputHandler implements NextEditorInputHandler, Ne
   }
 
   static init(editor: NextEditor) {
-    editor.getCustom<ListBlockInputHandler>('list-block-input-handler', ListBlockInputHandler);
+    editor.addCustom('list-block-input-handler', (editor) => new ListBlockInputHandler(editor));
   }
 }

@@ -44,6 +44,6 @@ export default class ListBlockMarkerCallbacks implements NextEditorCustom {
   };
 
   static init(editor: NextEditor) {
-    editor.getCustom<ListBlockMarkerCallbacks>('list-block-marker-callbacks', ListBlockMarkerCallbacks);
+    editor.addCustom('list-block-marker-callbacks', (editor) => new ListBlockMarkerCallbacks(editor));
   }
 }

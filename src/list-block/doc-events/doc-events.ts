@@ -44,6 +44,6 @@ export default class ListBlockDocCallbacks implements NextEditorDocCallbacks, Ne
   });
 
   static init(editor: NextEditor) {
-    editor.getCustom<ListBlockDocCallbacks>('list-block-doc-callbacks', ListBlockDocCallbacks);
+    editor.addCustom('list-block-doc-callbacks', (editor) => new ListBlockDocCallbacks(editor));
   }
 }
