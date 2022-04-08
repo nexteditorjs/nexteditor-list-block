@@ -1,6 +1,6 @@
 {
   "name": "@nexteditorjs/nexteditor-list-block",
-  "version": "0.0.31",
+  "version": "0.0.1",
   "files": [
     "dist"
   ],
