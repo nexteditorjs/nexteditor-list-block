@@ -3,7 +3,9 @@ import { ListData } from '../list-data';
 
 export default class ListBlockMarkerCallbacks implements NextEditorCustom {
   constructor(private editor: NextEditor) {
-    editor.rootContainer.addEventListener('click', this.handleClick);
+    setTimeout(() => {
+      editor.rootContainer.addEventListener('click', this.handleClick);
+    });
   }
 
   destroy() {
