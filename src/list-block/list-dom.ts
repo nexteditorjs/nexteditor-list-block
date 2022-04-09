@@ -4,10 +4,12 @@ import {
   createBlockContentElement, createBlockSimpleRange, createElement, DocBlock,
   DocObject,
   genId,
-  getBlockContent, getBlockType, getParentBlock, getParentContainer, isChildContainer, NextEditor,
+  getBlockContent, getBlockType, getLogger, getParentBlock, getParentContainer, isChildContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { ListData } from './list-data';
 import { startToMarker } from './marker/start-to-marker';
+
+const logger = getLogger('list-dom');
 
 export function isListBlock(block: BlockElement) {
   return getBlockType(block) === 'list';
@@ -16,8 +18,8 @@ export function isListBlock(block: BlockElement) {
 export function createListBlockContent(editor: NextEditor, path: BlockPath, blockElement: BlockElement, blockData: DocBlock, markerContent: string | Element): BlockContentElement {
   const listData = blockData as ListData;
   const children = blockData.children;
-  assert(children, 'list no children');
-  assert(children.length === 1 || children.length === 2, 'invalid list children');
+  assert(logger, children, 'list no children');
+  assert(logger, children.length === 1 || children.length === 2, 'invalid list children');
   const blockContent = createBlockContentElement(blockElement, 'div');
   addClass(blockContent, listData.listType);
   if (listData.listType === 'checkbox' && listData.checked) {
@@ -43,20 +45,20 @@ export function createListBlockContent(editor: NextEditor, path: BlockPath, bloc
 
 export function updateListStart(block: BlockElement, level: number, start: number) {
   const marker = block.querySelector('div.list-marker') as HTMLDivElement;
-  assert(marker, 'no list marker');
+  assert(logger, marker, 'no list marker');
   marker.innerText = startToMarker(level, start);
 }
 
 export function getTextContainer(listBlock: BlockElement): ContainerElement {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   const content = getBlockContent(listBlock);
   const textContainer = content.querySelector(':scope > div.editor-list-root > div.list-text-root [data-type=editor-container].child') as ContainerElement;
-  assert(textContainer, 'no list text container');
+  assert(logger, textContainer, 'no list text container');
   return textContainer as ContainerElement;
 }
 
 export function getListChildContainer(listBlock: BlockElement): ContainerElement | null {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   const content = getBlockContent(listBlock);
   const textContainer = content.querySelector(':scope > div.editor-list-root > div.list-child-root [data-type=editor-container].child') as ContainerElement;
   if (!textContainer) return null;
@@ -64,8 +66,8 @@ export function getListChildContainer(listBlock: BlockElement): ContainerElement
 }
 
 export function createListChildContainer(editor: NextEditor, listBlock: BlockElement, initDoc: DocObject, cloneDocResult?: CloneBlockResultInfo) {
-  assert(isListBlock(listBlock), 'not a list block');
-  assert(!getListChildContainer(listBlock), 'child container has already exists');
+  assert(logger, isListBlock(listBlock), 'not a list block');
+  assert(logger, !getListChildContainer(listBlock), 'child container has already exists');
   //
   const doc = cloneDoc(editor, initDoc, cloneDocResult);
   //
@@ -79,8 +81,8 @@ export function createListChildContainer(editor: NextEditor, listBlock: BlockEle
   });
   //
   const oldData = editor.getBlockData(listBlock);
-  assert(oldData.children, 'no list child');
-  assert(oldData.children.length === 1, 'invalid list children data');
+  assert(logger, oldData.children, 'no list child');
+  assert(logger, oldData.children.length === 1, 'invalid list children data');
   const newData = {
     ...oldData,
     children: [oldData.children[0], newContainerId],
@@ -91,7 +93,7 @@ export function createListChildContainer(editor: NextEditor, listBlock: BlockEle
 }
 
 export function getListChildContainers(listBlock: BlockElement): ContainerElement[] {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   const ret = [getTextContainer(listBlock)];
   const child = getListChildContainer(listBlock);
   if (child) {
@@ -107,7 +109,7 @@ export function isListTextChildBlock(block: BlockElement) {
   }
   //
   const parentBlock = getParentBlock(container);
-  assert(parentBlock, 'no parent block');
+  assert(logger, parentBlock, 'no parent block');
   if (!isListBlock(parentBlock)) {
     return false;
   }

@@ -74,8 +74,8 @@ export function updateCurrentListMarkerFrom(editor: NextEditor, containerId: str
   }
   //
 
-  assert(listData.type === 'list', 'not a list block');
-  assert(listData.listType === 'ordered', 'not an ordered list');
+  assert(logger, listData.type === 'list', 'not a list block');
+  assert(logger, listData.listType === 'ordered', 'not an ordered list');
   const container = editor.getContainerById(containerId);
   //
   const path = getContainerBlockPath(container);

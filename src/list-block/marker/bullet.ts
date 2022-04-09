@@ -1,7 +1,9 @@
-import { assert, createElement } from '@nexteditorjs/nexteditor-core';
+import { assert, createElement, getLogger } from '@nexteditorjs/nexteditor-core';
+
+const logger = getLogger('list-bullets');
 
 export function getBullet(level: number) {
-  assert(level >= 1, `invalid level, ${level}`);
+  assert(logger, level >= 1, `invalid level, ${level}`);
   const bullets = '•◦▪';
   const index = (level - 1) % bullets.length;
   const text = bullets[index];

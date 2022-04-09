@@ -6,13 +6,16 @@ import { assert,
   NextEditor,
   CloneBlockResultInfo,
   isTextKindBlock,
+  getLogger,
 } from '@nexteditorjs/nexteditor-core';
 import { getListChildContainers, getParentListBlock, isListBlock, isListTextChildBlock } from '../list-dom';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
 import { tryMergeTextToListBlock } from './merge-list-block';
 
+const logger = getLogger('handle-backspace-event');
+
 function listBlockToTextBlock(editor: NextEditor, listBlock: BlockElement) {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   //
   const childContainers = getListChildContainers(listBlock);
   const docs = childContainers.map((childContainer) => {
@@ -52,9 +55,9 @@ function listTextBlockHandleBackspaceEvent(editor: NextEditor) {
     return false;
   }
   const { start, end } = selectedBlock;
-  assert(start.isSimple() && end.isSimple(), 'invalid block position');
-  assert(start.offset === end.offset, 'invalid block offset');
-  assert(start.blockId === end.blockId, 'invalid selected block');
+  assert(logger, start.isSimple() && end.isSimple(), 'invalid block position');
+  assert(logger, start.offset === end.offset, 'invalid block offset');
+  assert(logger, start.blockId === end.blockId, 'invalid selected block');
   //
   const textBlock = selectedBlock.block;
   if (!isListTextChildBlock(textBlock)) {
@@ -62,10 +65,10 @@ function listTextBlockHandleBackspaceEvent(editor: NextEditor) {
   }
   //
   const blockData = editor.getBlockData(textBlock);
-  assert(blockData.text);
+  assert(logger, blockData.text, 'invalid block data, no block text');
   //
   const listBlock = getParentListBlock(textBlock);
-  assert(listBlock, 'invalid list block dom. no parent list block');
+  assert(logger, listBlock, 'invalid list block dom. no parent list block');
   //
   const offset = start.offset;
   if (offset === 0) {

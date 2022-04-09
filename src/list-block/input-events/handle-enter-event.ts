@@ -2,7 +2,7 @@ import {
   assert,
   BlockElement,
   DocBlockText,
-  genId, getBlockIndex, getContainerId, getParentContainer,
+  genId, getBlockIndex, getContainerId, getLogger, getParentContainer,
   getTextLength,
   isTextKindBlock,
   NextEditor, splitText,
@@ -11,13 +11,15 @@ import { insertListBlock } from '../insert-list-block';
 import { ListData } from '../list-data';
 import { getListChildContainer, getParentListBlock, isListBlock, isListTextChildBlock } from '../list-dom';
 
+const logger = getLogger('handle-enter-event');
+
 function getListType(editor: NextEditor, listBlock: BlockElement) {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   return (editor.getBlockData(listBlock) as ListData).listType;
 }
 
 function insertTextBlockToListChild(editor: NextEditor, listBlock: BlockElement, text: DocBlockText) {
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   const listChildContainer = getListChildContainer(listBlock);
   if (listChildContainer) {
     editor.insertBlock(getContainerId(listChildContainer), 0, {
@@ -47,13 +49,13 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
     return false;
   }
   const { start, end } = selectedBlock;
-  assert(start.isSimple() && end.isSimple(), 'invalid block position');
-  assert(start.offset === end.offset, 'invalid block offset');
-  assert(start.blockId === end.blockId, 'invalid selected block');
+  assert(logger, start.isSimple() && end.isSimple(), 'invalid block position');
+  assert(logger, start.offset === end.offset, 'invalid block offset');
+  assert(logger, start.blockId === end.blockId, 'invalid selected block');
   //
   const listTextChildBlock = selectedBlock.block;
   const listBlock = getParentListBlock(listTextChildBlock);
-  assert(listBlock, 'invalid list block dom. no parent list block');
+  assert(logger, listBlock, 'invalid list block dom. no parent list block');
   //
   if (!isTextKindBlock(editor, listTextChildBlock)) {
     insertTextBlockToListChild(editor, listBlock, []);
@@ -63,7 +65,7 @@ function listTextBlockHandleEnterEvent(editor: NextEditor) {
   const textBlock = listTextChildBlock;
   //
   const blockData = editor.getBlockData(textBlock);
-  assert(blockData.text);
+  assert(logger, blockData.text, 'invalid block data, no block text');
   //
   if (getTextLength(blockData.text) === 0 && !getListChildContainer(listBlock)) {
     // remove list

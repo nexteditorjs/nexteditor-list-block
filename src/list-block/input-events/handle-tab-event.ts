@@ -1,11 +1,13 @@
 import {
   assert, BlockElement, blocksToDoc, CloneBlockResultInfo,
-  getChildBlockCount, getPrevBlock,
+  getChildBlockCount, getLogger, getPrevBlock,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { findPrevListBlockCanBeInsert } from '../find-prev-list-block';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
 import { createListChildContainer, getListChildContainer, isListBlock } from '../list-dom';
+
+const logger = getLogger('handle-tab-event');
 
 function moveBlocksToPrevListChild(editor: NextEditor, blocks: BlockElement[], cloneDocResult: CloneBlockResultInfo) {
   if (blocks.length === 0) return false;
@@ -44,14 +46,14 @@ export function handleEditorTabEvent(editor: NextEditor) {
   let blocks: BlockElement[];
   //
   const { listBlock, adjustedBlock } = findResult;
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   //
   if (adjustedBlock === selectedBlocks[0].block) {
     //
     blocks = selectedBlocks.map((s) => s.block);
     //
   } else {
-    assert(selectedBlocks.length === 1, 'invalid selected blocks');
+    assert(logger, selectedBlocks.length === 1, 'invalid selected blocks');
     //
     blocks = [adjustedBlock];
     //

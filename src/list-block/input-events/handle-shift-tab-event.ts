@@ -1,19 +1,21 @@
 import {
   assert, BlockElement, blocksToDoc, CloneBlockResultInfo, getBlockIndex,
-  getChildBlocks, getParentBlock, getParentContainer, isRootContainer,
+  getChildBlocks, getLogger, getParentBlock, getParentContainer, isRootContainer,
   NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { findParentListChildContainer } from '../find-parent-list-child-container';
 import { keepSelectionAfterMoveBlocks } from './keep-selection-after-move-blocks';
 import { getListChildContainer, isListBlock } from '../list-dom';
 
+const logger = getLogger('handle-shift-tab-event');
+
 function moveBlocksOutListChild(editor: NextEditor, fromBlock: BlockElement, cloneDocResult: CloneBlockResultInfo): BlockElement[] {
   const parentContainer = getParentContainer(fromBlock);
-  assert(!isRootContainer(parentContainer), 'not a child block');
+  assert(logger, !isRootContainer(parentContainer), 'not a child block');
   const parentListBlock = getParentBlock(parentContainer);
-  assert(parentListBlock, 'no parent block');
-  assert(isListBlock(parentListBlock), 'not a list block');
-  assert(getListChildContainer(parentListBlock) === parentContainer, 'not a list child block');
+  assert(logger, parentListBlock, 'no parent block');
+  assert(logger, isListBlock(parentListBlock), 'not a list block');
+  assert(logger, getListChildContainer(parentListBlock) === parentContainer, 'not a list child block');
   const listChildContainer = parentContainer;
   //
   const fromIndex = getBlockIndex(fromBlock);
@@ -28,7 +30,7 @@ function moveBlocksOutListChild(editor: NextEditor, fromBlock: BlockElement, clo
   if (fromIndex === 0) {
     //
     const listData = editor.getBlockData(parentListBlock);
-    assert(listData.children, 'no list children');
+    assert(logger, listData.children, 'no list children');
     const oldChildContainerId = listData.children[1];
     const newData = {
       ...listData,
@@ -59,7 +61,7 @@ export function handleEditorShiftTabEvent(editor: NextEditor) {
   let fromBlock: BlockElement;
   //
   const { listBlock, adjustedBlock } = findRet;
-  assert(isListBlock(listBlock), 'not a list block');
+  assert(logger, isListBlock(listBlock), 'not a list block');
   //
   if (adjustedBlock === selectedBlocks[0].block) {
     fromBlock = selectedBlocks[0].block;

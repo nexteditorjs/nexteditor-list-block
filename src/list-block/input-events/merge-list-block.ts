@@ -1,11 +1,14 @@
 import {
   assert, BlockElement, complexBlockGetLastSimpleChild, editorMergeTextBlock,
   getLastChildBlock,
+  getLogger,
   getParentBlock, getParentContainer, getPrevBlock,
   isEmptyTextBlock, isRootContainer, isTextKindBlock, NextEditor,
   SimpleBlockPosition,
 } from '@nexteditorjs/nexteditor-core';
 import { isListBlock, isListTextChildBlock, getListChildContainer, getParentListBlock, getTextContainer } from '../list-dom';
+
+const logger = getLogger('merge-list-block');
 
 function isListFirstChildBlock(editor: NextEditor, block: BlockElement) {
   if (getPrevBlock(block)) {
@@ -17,7 +20,7 @@ function isListFirstChildBlock(editor: NextEditor, block: BlockElement) {
   }
   //
   const parentBlock = getParentBlock(parentContainer);
-  assert(parentBlock, 'no parent block');
+  assert(logger, parentBlock, 'no parent block');
   //
   if (!isListBlock(parentBlock)) {
     return false;
@@ -63,9 +66,9 @@ export function tryMergeTextToListBlock(editor: NextEditor): boolean {
     }
     //
     const parentListBlock = getParentListBlock(block);
-    assert(parentListBlock, 'no parent list block');
+    assert(logger, parentListBlock, 'no parent list block');
     const listText = getLastChildBlock(getTextContainer(parentListBlock));
-    assert(isTextKindBlock(editor, listText), 'not a text block');
+    assert(logger, isTextKindBlock(editor, listText), 'not a text block');
     editorMergeTextBlock(editor, listText, block);
     return true;
   }

@@ -1,8 +1,10 @@
 import {
-  assert, BlockElement, getParentBlock, getParentContainer, isFirstChildBlockInComplexBlock,
+  assert, BlockElement, getLogger, getParentBlock, getParentContainer, isFirstChildBlockInComplexBlock,
   isRootContainer, NextEditor,
 } from '@nexteditorjs/nexteditor-core';
 import { getListChildContainer, isListBlock } from './list-dom';
+
+const logger = getLogger('find-parent-list-child-container');
 
 export function findParentListChildContainer(editor: NextEditor, block: BlockElement): {
   listBlock: BlockElement;
@@ -15,7 +17,7 @@ export function findParentListChildContainer(editor: NextEditor, block: BlockEle
   }
   //
   const parentBlock = getParentBlock(parentContainer);
-  assert(parentBlock, 'no parent block');
+  assert(logger, parentBlock, 'no parent block');
   if (isListBlock(parentBlock) && getListChildContainer(parentBlock) === parentContainer) {
     return {
       listBlock: parentBlock,

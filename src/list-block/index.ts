@@ -15,7 +15,7 @@ import { getListMarker } from './list-marker';
 import ListBlockDocCallbacks from './doc-events/doc-events';
 import ListBlockMarkerCallbacks from './marker/marker-event';
 
-const console = getLogger('list-block');
+const logger = getLogger('list-block');
 
 function createBlockContent(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
   ListBlockInputHandler.init(editor);
@@ -65,19 +65,19 @@ function getCaretRect(block: BlockElement, pos: SimpleBlockPosition): DOMRect {
 
 function updateSelection(editor: NextEditor, block: BlockElement, from: BlockPosition, to: BlockPosition): void {
   if (from.isSimple()) {
-    assert(to.isSimple(), 'from is simple position but to is not simple position');
+    assert(logger, to.isSimple(), 'from is simple position but to is not simple position');
     //
-    console.debug('full select list');
+    logger.debug('full select list');
     addClass(block, 'full-selected');
     //
     return;
   }
   //
-  assert(!to.isSimple(), 'from is complex position but end is simple position');
+  assert(logger, !to.isSimple(), 'from is complex position but end is simple position');
   //
   const f = from as ComplexBlockPosition;
   const t = to as ComplexBlockPosition;
-  assert(f.blockId === t.blockId, 'only allow update one table selection');
+  assert(logger, f.blockId === t.blockId, 'only allow update one table selection');
   //
   const containers = getListChildContainers(block);
   containers.forEach((container) => {
@@ -120,8 +120,8 @@ function getSelectedContainers(complexBlock: BlockElement, start: ComplexBlockPo
   //
   const startIndex = containersIds.indexOf(start.childContainerId);
   const endIndex = containersIds.indexOf(end.childContainerId);
-  assert(startIndex !== -1, 'invalid start pos');
-  assert(endIndex !== -1, 'invalid end pos');
+  assert(logger, startIndex !== -1, 'invalid start pos');
+  assert(logger, endIndex !== -1, 'invalid end pos');
   //
   const ret = [childContainers[startIndex]];
   if (startIndex !== endIndex) {
