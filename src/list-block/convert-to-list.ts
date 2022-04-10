@@ -4,12 +4,16 @@ import {
   isTextKindBlock, NextEditor, splitText,
 } from '@nexteditorjs/nexteditor-core';
 import { ListData } from './list-data';
+import { isListTextChildBlock } from './list-dom';
 
 const logger = getLogger('convert-to-list');
 
 export function convertToList(editor: NextEditor, srcBlock: BlockElement, options: { offset: number, data?: DocBlockAttributes }): ConvertBlockResult | null {
   //
   if (!isTextKindBlock(editor, srcBlock)) {
+    return null;
+  }
+  if (isListTextChildBlock(srcBlock)) {
     return null;
   }
   //
