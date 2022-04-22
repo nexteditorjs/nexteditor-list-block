@@ -99,11 +99,11 @@ function clearSelection(editor: NextEditor): void {
   });
 }
 
-function getChildContainers(complexBlock: BlockElement): ContainerElement[] {
+function getChildContainers(editor: NextEditor, complexBlock: BlockElement): ContainerElement[] {
   return getListChildContainers(complexBlock);
 }
 
-function getNextContainer(complexBlock: BlockElement, childContainer: ContainerElement, type: MoveDirection, options?: NextContainerOptions): ContainerElement | null {
+function getNextContainer(editor: NextEditor, complexBlock: BlockElement, childContainer: ContainerElement, type: MoveDirection, options?: NextContainerOptions): ContainerElement | null {
   if (type === 'ArrowDown' || type === 'ArrowRight') {
     if (childContainer === getTextContainer(complexBlock)) {
       return getListChildContainer(complexBlock);
@@ -114,7 +114,7 @@ function getNextContainer(complexBlock: BlockElement, childContainer: ContainerE
   return null;
 }
 
-function getSelectedContainers(complexBlock: BlockElement, start: ComplexBlockPosition, end: ComplexBlockPosition): ContainerElement[] {
+function getSelectedContainers(editor: NextEditor, complexBlock: BlockElement, start: ComplexBlockPosition, end: ComplexBlockPosition): ContainerElement[] {
   const childContainers = getListChildContainers(complexBlock);
   const containersIds = childContainers.map(getContainerId);
   //
