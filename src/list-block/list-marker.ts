@@ -38,8 +38,11 @@ export function getListStart(editor: NextEditor, container: ContainerElement, bl
   return count;
 }
 
-export function getListMarker(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number): string | Element {
+export function getListMarker(editor: NextEditor, path: BlockPath, container: ContainerElement): string | Element {
   const level = getListLevel(editor, path);
+  //
+  const blockIndex = path[path.length - 1].blockIndex;
+  assert(logger, typeof blockIndex === 'number', 'blockIndex is not a number');
   //
   const containerId = getContainerId(container);
   const currData = editor.doc.getBlockData(containerId, blockIndex) as ListData;

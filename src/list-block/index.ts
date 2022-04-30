@@ -17,11 +17,11 @@ import ListBlockMarkerCallbacks from './marker/marker-event';
 
 const logger = getLogger('list-block');
 
-function createBlockContent(editor: NextEditor, path: BlockPath, container: ContainerElement, blockIndex: number, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
+function createBlockContent(editor: NextEditor, path: BlockPath, container: ContainerElement, blockElement: BlockElement, blockData: DocBlock): BlockContentElement {
   ListBlockInputHandler.init(editor);
   ListBlockDocCallbacks.init(editor);
   ListBlockMarkerCallbacks.init(editor);
-  return createListBlockContent(editor, path, blockElement, blockData, getListMarker(editor, path, container, blockIndex));
+  return createListBlockContent(editor, path, blockElement, blockData, getListMarker(editor, path, container));
 }
 
 function getBlockTextLength(block: BlockElement): number {
