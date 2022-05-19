@@ -15,6 +15,7 @@
     "declaration": true,
     "declarationDir": "dist",
     // "noEmit": true,
+    "skipLibCheck": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true
